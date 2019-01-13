@@ -13,15 +13,6 @@ import random
 seed = 7
 
 random.seed(seed)
-"""
-
-from numpy import loadtxt
-from urllib.request import urlopen
-url = 'https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv'
-raw_data = urlopen(url)
-dataset = loadtxt(raw_data, delimiter=",")
-print(dataset.shape)
-"""
 
 # We placed the dataset under datasets/ sub folder
 DATASET_PATH = 'dataset/'
@@ -38,42 +29,42 @@ dataset.columns = [
     "DiPedFunc", "Age", "HasDiabetes"]
 
 
-
-# Calculate the median value for BMI
+# Calculate the median value for columns and substitute it where values are 0
 median_bmi = dataset['BMI'].median()
-# Substitute it in the BMI column of the
-# dataset where values are 0
-dataset['BMI'] = dataset['BMI'].replace(
-    to_replace=0, value=median_bmi)
-
-# Calculate the median value for BloodP
+dataset['BMI'] = dataset['BMI'].replace(to_replace=0, value=median_bmi)
 median_bloodp = dataset['BloodP'].median()
-# Substitute it in the BloodP column of the
-# dataset where values are 0
-dataset['BloodP'] = dataset['BloodP'].replace(
-    to_replace=0, value=median_bloodp)
-
-# Calculate the median value for PlGlcConc
+dataset['BloodP'] = dataset['BloodP'].replace( to_replace=0, value=median_bloodp)
 median_plglcconc = dataset['PlGlcConc'].median()
-# Substitute it in the PlGlcConc column of the
-# dataset where values are 0
-dataset['PlGlcConc'] = dataset['PlGlcConc'].replace(
-    to_replace=0, value=median_plglcconc)
-
-# Calculate the median value for PlGlcConc
+dataset['PlGlcConc'] = dataset['PlGlcConc'].replace(to_replace=0, value=median_plglcconc)
 median_plglcconc = dataset['PlGlcConc'].median()
-# Substitute it in the PlGlcConc column of the
-# dataset where values are 0
-dataset['PlGlcConc'] = dataset['PlGlcConc'].replace(
-    to_replace=0, value=median_plglcconc)
-
-# Calculate the median value for TwoHourSerIns
+dataset['PlGlcConc'] = dataset['PlGlcConc'].replace(to_replace=0, value=median_plglcconc)
 median_twohourserins = dataset['TwoHourSerIns'].median()
-# Substitute it in the TwoHourSerIns column of the
-# dataset where values are 0
-dataset['TwoHourSerIns'] = dataset['TwoHourSerIns'].replace(
-    to_replace=0, value=median_twohourserins)
+dataset['TwoHourSerIns'] = dataset['TwoHourSerIns'].replace(to_replace=0, value=median_twohourserins)
 
+# Split the training dataset in 80% / 20%
+from sklearn.model_selection import train_test_split
+train_set, test_set = train_test_split(
+    dataset, test_size=0.2, random_state=42)
+
+# Separate labels from the rest of the dataset
+train_set_labels = train_set["HasDiabetes"].copy()
+train_set = train_set.drop("HasDiabetes", axis=1)
+
+test_set_labels = test_set["HasDiabetes"].copy()
+test_set = test_set.drop("HasDiabetes", axis=1)
+
+train_set = train_set.astype(float)
+
+# Feature Scaling
+# Apply a scaler
+from sklearn.preprocessing import MinMaxScaler as Scaler
+scaler = Scaler()
+scaler.fit(train_set)
+train_set_scaled = scaler.transform(train_set)
+test_set_scaled = scaler.transform(test_set)
+
+# Import the algorithm we want to test
+from sklearn.ensemble import RandomForestClassifier
 
 
 # Split the training dataset in 80% / 20%
